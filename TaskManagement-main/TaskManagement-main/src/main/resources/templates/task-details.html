@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{task.title}">Task Information</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        h5{
+            font-weight: bold;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .task-info {
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .task-info:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="container my-5">
+    <div th:insert="~{navbar :: frag}" class="pb-5">
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card" th:object="${task}">
+                <div class="card-header">
+                    <h5 class="mb-0" th:text="#{task.title}"></h5>
+                </div>
+                <div class="card-body">
+                    <div class="task-info">
+                        <div><strong th:text="#{task.id}"></strong> <span th:text="*{id}"></span></div>
+                    </div>
+                    <div class="task-info">
+                        <div><strong th:text="#{task.createdAt}"></strong> <span th:text="*{createdAt}"></span></div>
+                    </div>
+                    <div class="task-info" th:if="*{durationInHour!=null}">
+                        <div><strong th:text="#{task.duration}"></strong> <span th:text="*{durationInHour}"></span></div>
+                    </div>
+                    <div class="task-info" th:if="*{durationInHour==null}">
+                        <div><strong th:text="#{task.deadline}"></strong> <span th:text="*{#temporals.format(deadline, 'dd.MM.yyyy')}"></span></div>
+                    </div>
+                    <div class="task-info">
+                        <div th:if="*{priority.name() == 'LOW'}"><strong th:text="#{task.priority}"></strong> <span th:text="#{task.priority.low}"></span></div>
+                        <div th:if="*{priority.name() == 'HIGH'}"><strong th:text="#{task.priority}"></strong> <span th:text="#{task.priority.high}"></span></div>
+                        <div th:if="*{priority.name() == 'NORMAL'}"><strong th:text="#{task.priority}"></strong> <span th:text="#{task.priority.normal}"></span></div>                    </div>
+                    <div class="task-info">
+                        <div><strong th:text="#{task.completed}"></strong> <span th:text="*{isCompleted} ? #{task.yes} : #{task.no}"></span></div>
+                    </div>
+                    <div class="task-info">
+                        <div><strong th:text="#{task.title}"></strong> <span th:text="*{title}"></span></div>
+                    </div>
+                    <div class="task-info">
+                        <div><strong th:text="#{task.content}"></strong> <span th:text="*{content}"></span></div>
+                    </div>
+                    <div class="task-info" th:if="*{durationInHour!=null && remainingHours!=0}">
+                        <div><strong th:text="#{task.remainingHours}"></strong> <span th:text="*{remainingHours}"></span></div>
+                    </div>
+                    <div class="task-info" th:if="*{durationInHour!=null && remainingHours!=0}">
+                        <div><strong th:text="#{task.remainingMinutes}"></strong> <span th:text="*{remainingMinutes}"></span></div>
+                    </div>
+                    <div class="task-info" th:if="*{passed==true}">
+                        <div><strong  th:text="#{task.deadline.pass}" class="fw-bold text-danger"></strong> </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h5 th:text="#{task.subTasks}">Sub Tasks</h5>
+                        <div class="task-info d-flex justify-content-between" th:each="sub: ${task.subTasks}">
+                            <div class="" th:text="${sub.title}"></div>
+                            <form th:action="@{/{id}(id=${task.id},sub_id=${sub.id})}" method="post">
+                                <button class="btn btn-danger" th:text="#{task.markUncompleted}" th:if="${sub.isCompleted}" ></button>
+                                <button class="btn btn-success" th:text="#{task.markComplete}" th:if="${sub.isCompleted==false}" ></button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <a class="btn btn-primary me-2" th:text="#{task.edit}" th:href="@{/task/edit/{id}(id=${task.id})}" ></a>
+                        <form th:action="@{/task/delete/{id}(id=${task.id})}" method="post">
+                        <button class="btn btn-danger me-2" th:text="#{task.delete}"></button>
+                        </form>
+                        <form th:action="@{/mark/{id}(id=${task.id})}" method="post">
+                            <button class="btn btn-warning" th:text="#{task.markUncompleted}" th:if="${task.isCompleted}" ></button>
+                            <button class="btn btn-success" th:text="#{task.markComplete}" th:if="${task.isCompleted==false}" ></button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

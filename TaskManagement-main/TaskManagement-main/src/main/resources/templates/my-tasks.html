@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title th:text="#{task.list}">Task List</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<div th:insert="~{navbar :: frag}" class="pb-5">
+</div>
+
+<div class="container my-5">
+    <h1 class="text-center mb-4" th:text="#{task.list}"></h1>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        <div th:each="task : ${tasks}" class="col">
+            <div class="card h-100">
+                <div class="card-body shadow">
+                    <h5 class="card-title" th:text="${task.title}">Task Title</h5>
+                    <p class="card-text" th:text="${task.content}">Task Content</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge rounded-pill text-bg-primary" th:text="#{task.priority}">Priority</span>
+                            <span class="badge rounded-pill text-bg-secondary" th:if="${task.durationInHour==null}" th:text="'Deadline:'+${#temporals.format(task.deadline, 'dd.MM.yyyy')}">Deadline</span>
+                            <span class="badge rounded-pill text-bg-secondary" th:if="${task.durationInHour!=null}" th:text="#{task.remaining.hour} + ' ' + ${task.remainingHours} + ' ' + #{task.remaining.minute} + ':' + ${task.remainingMinutes}"></span>
+                        </div>
+                        <div>
+                            <span class="badge rounded-pill text-bg-success" th:if="${task.isCompleted}" th:text="#{task.completed}">Completed</span>
+                            <span class="badge rounded-pill text-bg-danger" th:unless="${task.isCompleted}" th:text="#{task.pending}">Pending</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row-reverse mt-3">
+                        <a class="btn btn-info" th:href="@{/task/{taskId}(taskId=${task.id})}" th:text="#{task.view}">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end my-5">
+        <div th:if="${currentPage > 0}">
+            <a class="btn btn-success mx-2" th:href="@{/tasks(page=${currentPage - 1})}" th:text="#{pagination.back}">Back</a>
+        </div>
+        <div th:if="${currentPage != totalPages}">
+            <a class="btn btn-danger mx-2" th:href="@{/tasks(page=${currentPage + 1})}" th:text="#{pagination.next}">Next</a>
+        </div>
+    </div>
+</div>
+</body>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<div th:insert="~{navbar :: frag}" class="pb-5">
+</div>
+
+<div class="container pt-5 ">
+
+    <div class="container mt-5 bg-body-secondary rounded shadow  " th:object="${task}">
+        <h1 class="py-5 display-3" th:text="#{CreateTask}">Create Task</h1>
+        <form th:action="@{/task/edit/{id}(id=*{id})}"  method="post">
+            <div class="mb-3 ">
+                <label for="title" class="form-label " th:text="#{task.title}">Task Title</label>
+                <input type="text" class="form-control" id="title" name="title" th:field="*{title}">
+                <p th:if="${#fields.hasErrors('title')}" class="text-danger" th:errors="*{title}"></p>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label bold" th:text="#{task.content}">Task Content</label>
+                <textarea class="form-control" id="content" name="content" rows="3" th:field="*{content}"></textarea>
+                <p th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger"></p>
+
+            </div>
+            <div class="mb-3">
+                <label for="priority" class="form-label" th:text="#{task.priority}">Priority</label>
+                <select class="form-select" id="priority" name="priority" th:field="*{priority}">
+                    <option value="LOW" th:text="#{task.priority.low}">Low</option>
+                    <option value="NORMAL" th:text="#{task.priority.normal}">NORMAL</option>
+                    <option value="HIGH" th:text="#{task.priority.high}">High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" th:text="#{task.deadline}">Deadline</label>
+                <div  th:if="${task.deadline != null or #fields.hasErrors('deadline')}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deadlineType" id="dateDeadline" value="date" checked>
+                        <label class="form-check-label" for="dateDeadline" th:text="#{task.deadline}">
+                            Date
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deadlineType" id="hourDeadline" value="hour" >
+                        <label class="form-check-label" for="hourDeadline" th:text="#{task.deadline.hour}">
+                            Hour
+                        </label>
+                    </div>
+
+
+                </div>
+                <div th:if="${task.deadline == null or #fields.hasErrors('durationInHour')}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deadlineType" id="dateDeadline" value="date" >
+                        <label class="form-check-label" for="dateDeadline" th:text="#{task.deadline}">
+                            Date
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="deadlineType" id="hourDeadline" value="hour" checked>
+                        <label class="form-check-label" for="hourDeadline" th:text="#{task.deadline.hour}">
+                            Hour
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+            <div th:if="${task.deadline != null or #fields.hasErrors('deadline')}">
+                <div class="mb-3" id="dateDeadlineContainer">
+                    <label for="deadlineDate" class="form-label" th:text="#{task.deadline.date}">Deadline Date</label>
+                    <input type="text" class="form-control" id="deadlineDate" name="deadlineDate" th:field="*{deadline}" placeholder="dd-MM-yyyy" >
+                    <p th:if="${#fields.hasErrors('deadline')}" class="text-danger" th:errors="*{deadline}"></p>
+                </div>
+
+                <div class="mb-3" id="hourDeadlineContainer" style="display:none;">
+                    <label for="durationInHour" class="form-label" th:text="#{task.deadline.hour}">Deadline Hour</label>
+                    <input type="number" class="form-control" id="durationInHour" name="deadlineHour" th:field="*{durationInHour}">
+                    <p th:if="${#fields.hasErrors('durationInHour')}" class="text-danger" th:errors="*{durationInHour}"></p>
+                </div>
+
+            </div>
+
+            <div th:if="${task.deadline == null or #fields.hasErrors('durationInHour')}">
+                <div class="mb-3" id="dateDeadlineContainer" style="display:none;">
+                    <label for="deadlineDate" class="form-label" th:text="#{task.deadline.date}">Deadline Date</label>
+                    <input type="text" class="form-control" id="deadlineDate" name="deadlineDate" th:field="*{deadline}" placeholder="dd-MM-yyyy">
+                    <p th:if="${#fields.hasErrors('deadline')}" class="text-danger" th:errors="*{deadline}"></p>
+                </div>
+
+                <div class="mb-3" id="hourDeadlineContainer" >
+                    <label for="durationInHour" class="form-label" th:text="#{task.deadline.hour}">Deadline Hour</label>
+                    <input type="number" class="form-control" id="durationInHour" name="deadlineHour" th:field="*{durationInHour}">
+                    <p th:if="${#fields.hasErrors('durationInHour')}" class="text-danger" th:errors="*{durationInHour}"></p>
+                </div>
+
+            </div>
+            <div class="mb-3">
+                <label class="form-label" th:text="#{task.subTasks}">Sub-Tasks</label>
+                <div id="subTaskContainer" >
+                    <div class="input-group mb-3" th:each="sub, subStat : *{subTasks}">
+                        <input type="text" class="form-control" th:name="'subTasks[' + ${subStat.index} + '].title'" placeholder="Sub-Task Name" th:value="${sub.title}">
+                        <button type="button" class="btn btn-danger" onclick="removeSubTask(this)">Remove</button>
+                    </div>
+                    <div class="input-group mb-3" >
+                        <input type="text" class="form-control" th:name="'subTasks[' + ${#lists.size(task.subTasks)} + '].title'"placeholder="Sub-Task Name">
+                        <button type="button" class="btn btn-danger" onclick="removeSubTask(this)">Remove</button>
+                    </div>
+
+
+                </div>
+                <button type="button" class="btn btn-primary" onclick="addSubTask()" th:text="#{task.subTasks.add}">Add Sub-Task</button>
+            </div>
+            <div class="p-3 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary shadow" th:text="#{task.edit}"></button>
+
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    let subTaskIndex = /*[[${#lists.size(task.subTasks)}]]*/ 0;
+    let deadline = /*[[${task.deadline}]]*/ "";
+
+
+    // ... (existing removeSubTask function)
+    /*]]>*/
+</script>
+
+<script>
+    function formatDate(input) {
+
+    var dateParts = input.split("-");
+    console.log(dateParts)
+
+    if (dateParts.length === 3) {
+        var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+        console.log(dateParts)
+        document.getElementById('deadlineDate').value = formattedDate;
+    }
+}
+
+if(deadline!=null)
+{
+formatDate(deadline)
+}
+
+console.log(subTaskIndex)
+    if(subTaskIndex<=0)subTaskIndex=1
+    function addSubTask() {
+        const container = document.getElementById('subTaskContainer');
+        const newSubTask = document.createElement('div');
+        newSubTask.classList.add('input-group', 'mb-3');
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = `subTasks[${subTaskIndex}].title`;
+        input.classList.add('form-control');
+        input.placeholder = 'Sub-Task Name';
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('btn', 'btn-danger');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = function() { removeSubTask(this); };
+
+        newSubTask.appendChild(input);
+        newSubTask.appendChild(removeButton);
+        container.appendChild(newSubTask);
+
+        subTaskIndex++;
+                console.log(subTaskIndex)
+
+    }
+
+    function removeSubTask(button) {
+        const inputGroup = button.parentNode;
+        inputGroup.parentNode.removeChild(inputGroup);
+
+    }
+
+    const dateDeadlineContainer = document.getElementById('dateDeadlineContainer');
+    const hourDeadlineContainer = document.getElementById('hourDeadlineContainer');
+    const dateDeadlineRadio = document.getElementById('dateDeadline');
+    const hourDeadlineRadio = document.getElementById('hourDeadline');
+    const inputDate=document.getElementById('deadlineDate');
+    const inputHour = document.getElementById('durationInHour');
+
+    dateDeadlineRadio.addEventListener('change', function() {
+        dateDeadlineContainer.style.display = 'block';
+        hourDeadlineContainer.style.display = 'none';
+        inputDate.value=''
+
+    });
+
+
+    hourDeadlineRadio.addEventListener('change', function() {
+        dateDeadlineContainer.style.display = 'none';
+        hourDeadlineContainer.style.display = 'block';
+        inputHour.value=''
+
+    });
+</script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</html>

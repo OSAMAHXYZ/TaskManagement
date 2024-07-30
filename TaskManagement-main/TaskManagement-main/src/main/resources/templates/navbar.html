@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg fixed-top bg-secondary navbar-light mb-5" th:fragment="frag">
+    <div class="container">
+        <div class="navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold mx-2 hover-shadow" th:text="#{MyTasks}" th:href="@{/tasks}" methods="get"><i class="fas fa-plus-circle pe-2"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-bold mx-2"  th:href="@{/create-task}" th:text="#{CreateTask}" methods="get"><i class="fas fa-bell pe-2"></i></a>
+                </li>
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle" th:text="#{language}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" th:href="@{''(lang='en')}">English</a></li>
+                        <li><a class="dropdown-item" th:href="@{''(lang='tr')}">Türkçe</a></li>
+                        <li><a class="dropdown-item" th:href="@{''(lang='de')}">German</a></li>
+
+
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Navbar -->
+</body>
+</html>
